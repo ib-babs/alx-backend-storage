@@ -14,22 +14,21 @@ class Cache:
         self._redis.flushdb()
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
+        '''Store a random key in database'''
         random_key = str(uuid4())
         self._redis.set(random_key, data)
         return random_key
 
-    def get(self, key: str, fn: Optional[Callable]) -> None:
+    def get(self, key: str, fn: Optional[Callable]) -> Union[str, bytes, int, float]:
+        '''Get converted value'''
+        if fn is not None:
+            return fn(self._redis.get(key))
         return self._redis.get(key)
 
+    def get_str(self, key: str) -> str:
+        '''Parameterized to str'''
+        return Cache.get(key).decode('utf-8')
 
-cache = Cache()
-
-TEST_CASES = {
-    b"foo": None,
-    123: int,
-    "bar": lambda d: d.decode("utf-8")
-}
-
-for value, fn in TEST_CASES.items():
-    key = cache.store(value)
-    assert cache.get(key, fn=fn) == value
+    def get_int(self, key: str) -> int:
+        '''Parameterized to int'''
+        return int(Cache.get(key))
