@@ -28,7 +28,7 @@ class Cache:
 
     def get_str(self, key: str) -> str:
         '''Parameterized to str'''
-        return Cache.get(key).decode('utf-8')
+        return str(Cache.get(key))
 
     def get_int(self, key: str) -> int:
         '''Parameterized to int'''
